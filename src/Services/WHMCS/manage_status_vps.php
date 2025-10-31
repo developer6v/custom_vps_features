@@ -25,6 +25,9 @@ function manage_status_vps($serviceId) {
                 <style>
                   .status{ display:none; }
                   .status--pendente{ display:inline; color:#E6A15A!important; } /* laranja suave */
+                  .status:before {
+                    background-color:#E6A15A!important ;
+                  }
                 </style>
                 <script>
                   console.log('encontrou', {$resultJson});
