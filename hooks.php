@@ -11,7 +11,12 @@ add_hook('ClientAreaFooterOutput', 1, function (array $vars) {
             | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
         );
 
-        return "<script>console.log($varsJson);</script>";
+        return "<script>
+        const url = new URL(window.location.href);
+        const id = url.searchParams.get('id');
+        console.log('id da URL:', id);
+        
+        console.log($varsJson);</script>";
     }
 
     return "";
