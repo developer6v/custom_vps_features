@@ -22,12 +22,19 @@ function manage_status_vps($serviceId) {
         $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
         if ($ip == "" || !$ip) {
             return "
+                <style>
+                  .status{ display:none; }
+                  .status--pendente{ display:inline; color:#E6A15A; } /* laranja suave */
+                </style>
                 <script>
-                console.log('encontrou', {$resultJson});
-                document.addEventListener('DOMContentLoaded', function () {
+                  console.log('encontrou', {$resultJson});
+                  document.addEventListener('DOMContentLoaded', function () {
                     var el = document.querySelector('.status');
-                    if (el) { el.textContent = 'Pendente'; }
-                });
+                    if (el) {
+                      el.textContent = 'Pendente';
+                      el.classList.add('status--pendente');
+                    }
+                  });
                 </script>
             ";
         }
