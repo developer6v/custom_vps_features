@@ -1,16 +1,16 @@
 <?php
 
-
 function manage_status_vps($serviceId) {
     $params = [
         'serviceid' => $serviceId,
-        'stats'     => true,    
+        'stats'     => true,
     ];
 
     $result = localAPI('GetClientsProducts', $params);
-    $productname = $result["products"]["product"][0]["name"];
-    if (strpos($productname, 'VPS') !== false) {
-        $ip = $result["products"]["product"][0]["dedicatedip"];
+
+    $productname = $result["products"]["product"][0]["name"] ?? '';
+    if (stripos($productname, 'VPS') !== false) { // ignora maiúsculas/minúsculas
+        $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
         if ($ip == "" || !$ip) {
             return "
                 <script>
@@ -23,9 +23,26 @@ function manage_status_vps($serviceId) {
         }
     }
 
-    return "<script>console.log('não encontrou');</script>";
+    // Retorna também o result do localAPI no console
+    \$payload = " . json_encode(
+        $result,
+        JSON_UNESCAPED_UNICODE
+        | JSON_UNESCAPED_SLASHES
+        | JSON_HEX_TAG
+        | JSON_HEX_APOS
+        | JSON_HEX_QUOT
+        | JSON_HEX_AMP
+    ) . ";
+
+    return '<script>console.log(\"não encontrou\", ' . json_encode(
+        $result,
+        JSON_UNESCAPED_UNICODE
+        | JSON_UNESCAPED_SLASHES
+        | JSON_HEX_TAG
+        | JSON_HEX_APOS
+        | JSON_HEX_QUOT
+        | JSON_HEX_AMP
+    ) . ');</script>';
 }
-
-
 
 ?>
