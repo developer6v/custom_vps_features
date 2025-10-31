@@ -9,11 +9,12 @@ function manage_status_vps($serviceId) {
     $result = localAPI('GetClientsProducts', $params);
 
     $productname = $result["products"]["product"][0]["name"] ?? '';
-    if (stripos($productname, 'VPS') !== false) { // ignora maiúsculas/minúsculas
+    if (stripos($productname, 'VPS') !== false) { 
         $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
         if ($ip == "" || !$ip) {
             return "
                 <script>
+                console.log('encontrou');
                 document.addEventListener('DOMContentLoaded', function () {
                     var el = document.querySelector('.status');
                     if (el) { el.textContent = 'Pendente'; }
