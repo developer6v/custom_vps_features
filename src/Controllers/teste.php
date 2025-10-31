@@ -9,7 +9,7 @@ $params = [
   'stats'     => true,      // opcional: mais campos do serviço
 ];
 
-$result = localAPI('GetClientsProducts', $params, $adminUsername);
+$result = localAPI('GetClientsProducts', $params);
 
 header('Content-Type: application/json; charset=utf-8');
 echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
