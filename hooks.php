@@ -5,12 +5,9 @@ require_once('src/Services/index.php');
 add_hook('ClientAreaFooterOutput', 1, function (array $vars) {
 
     if ($vars["action"] == "productdetails") {
-        $varsJson = json_encode(
-            $vars,
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-            | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
-        );
+    $serviceId = (int)($vars['serviceid'] ?? $vars['id'] ?? ($_GET['id'] ?? 0));
 
+    return "<script>console.log('serviceId (hook): {$serviceId}');</script>";
         return "<script>
         const url = new URL(window.location.href);
         const id = url.searchParams.get('id');
