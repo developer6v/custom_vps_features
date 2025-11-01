@@ -16,7 +16,6 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
 
         $output = manage_status_vps($serviceId, $result);
         $output .= manage_abas_vps($serviceId, $result);
-        $output .= manage_status_clientarea($serviceId, $result);
         return $output;
     } elseif ($vars["action"] == "clientarea") {
         $serviceId = (int)($vars['serviceid'] ?? $vars['id'] ?? ($_GET['id'] ?? 0));
@@ -28,7 +27,7 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
 
         $result = localAPI('GetClientsProducts', $params);
 
-        $output = manage_status_clientarea($serviceId, $result);
+        $output = manage_status_clientarea();
         return $output;
     }
 
