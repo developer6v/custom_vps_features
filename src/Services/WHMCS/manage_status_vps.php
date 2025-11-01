@@ -1,12 +1,7 @@
 <?php
 
-function manage_status_vps($serviceId) {
-    $params = [
-        'serviceid' => $serviceId,
-        'stats'     => true,
-    ];
+function manage_status_vps($serviceId, $result) {
 
-    $result = localAPI('GetClientsProducts', $params);
     $resultJson = json_encode(
         $result,
         JSON_UNESCAPED_UNICODE
@@ -17,6 +12,7 @@ function manage_status_vps($serviceId) {
         | JSON_HEX_AMP
     );
 
+    
     $productname = $result["products"]["product"][0]["name"] ?? '';
     if (stripos($productname, 'VPS') !== false) {
         $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
@@ -34,7 +30,7 @@ function manage_status_vps($serviceId) {
                   document.addEventListener('DOMContentLoaded', function () {
                     var el = document.querySelector('.status');
                     if (el) {
-                      el.textContent = 'Pendente';
+                      el.textContent = 'Fazendo Setup';
                       el.classList.add('status--pendente');
                     }
                   });
