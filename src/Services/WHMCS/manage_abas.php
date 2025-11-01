@@ -25,12 +25,14 @@ informacoes adicionais
             return "
                 <style>
                   
-                  .panel-nav .nav-tabs li:has(> a[href='#email']),
+                    .panel-nav .nav-tabs li:has(> a[href='#email']),
                     .panel-nav .nav-tabs li:has(> a[href='#configoptions']),
-                    .panel-nav .nav-tabs li:has(> a[href='#additionalinfo'])
-                    { display: none !important; }
-                  
-            
+                    .panel-nav .nav-tabs li:has(> a[href='#additionalinfo']),
+                    .panel-nav .nav-tabs li:has(> a[href='#cloudflare-config'])
+                    { 
+                    display: none !important; 
+                    }
+
                     .merged-additionalinfo {
                         margin-top: 16px;
                         padding-top: 12px;
