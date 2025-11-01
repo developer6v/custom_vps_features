@@ -17,6 +17,7 @@ function manage_status_clientarea() {
 </style>
 
 <script>
+    console.log("chegou aqui");
 (function () {
   "use strict";
 
