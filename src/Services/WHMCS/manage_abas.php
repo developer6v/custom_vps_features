@@ -26,13 +26,63 @@ informacoes adicionais
             return "
                 <style>
                   
+                  .panel-nav .nav-tabs li:has(> a[href='#email']),
+                    .panel-nav .nav-tabs li:has(> a[href='#configoptions']),
+                    .panel-nav .nav-tabs li:has(> a[href='#additionalinfo'])
+                    { display: none !important; }
                   
-                  
-                  
+                    .tab-content > .tab-pane#email,
+                    .tab-content > .tab-pane#configoptions,
+                    .tab-content > .tab-pane#additionalinfo
+                    /* .tab-content > .tab-pane#cloudflare */ 
+                    { display: none !important; }
+
+                    .merged-additionalinfo {
+                        margin-top: 16px;
+                        padding-top: 12px;
+                        border-top: 1px solid rgba(0,0,0,.08);
+                    }
+                    .merged-additionalinfo > .merged-title {
+                        font-weight: 600;
+                        margin: 0 0 8px;
+                        font-size: 14px;
+                        line-height: 1.2;
+                    }
                 </style>
                 <script>
-                  console.log('encontrou abas', {$resultJson});
-                 
+                  (function(){
+                    try {
+                      console.log('encontrou abas', {$resultJson});
+
+                      var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
+                      var addPane    = document.querySelector('.tab-content > .tab-pane#additionalinfo');
+
+                      // só prossegue se existir #domain e #additionalinfo
+                      if (!domainPane || !addPane) return;
+
+                      // evita duplicar se já fundiu
+                      if (domainPane.querySelector('.merged-additionalinfo')) return;
+
+                      // cria wrapper
+                      var wrap = document.createElement('div');
+                      wrap.className = 'merged-additionalinfo';
+
+                      var title = document.createElement('h4');
+                      title.className = 'merged-title';
+                      title.textContent = 'Informações adicionais';
+                      wrap.appendChild(title);
+
+                      // move TODO o conteúdo (filhos) de #additionalinfo para o wrapper
+                      while (addPane.firstChild) {
+                        wrap.appendChild(addPane.firstChild);
+                      }
+
+                      // injeta no final da aba do servidor
+                      domainPane.appendChild(wrap);
+                    } catch(e) {
+                      console.error('merge additionalinfo -> domain falhou:', e);
+                    }
+                  })();
                 </script>
             ";
         }
