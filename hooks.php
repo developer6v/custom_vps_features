@@ -32,7 +32,7 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
     }
 
 // dentro do callback do ClientAreaHeaderOutput
-return '<script>console.log(' . json_encode($vars['action'] ?? null) . ');</script>';
+return '<script>console.log("ClientAreaHeaderOutput vars:", ' . json_encode($vars, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ');</script>';
 
 });
 
