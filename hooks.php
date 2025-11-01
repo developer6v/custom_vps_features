@@ -31,7 +31,7 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
         return $output;
     }
 
-    return "<script>console.log($vars)</script>";
+    return "<script>console.log(" . $vars["action"] . ")</script>";
 
 });
 
