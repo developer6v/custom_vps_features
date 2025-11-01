@@ -73,10 +73,14 @@ function manage_status_clientarea() {
           activeBadge.classList.remove('label-success');
           activeBadge.classList.add('label-setup');
         } else {
-          activeBadge.style('display', 'block');
+          activeBadge.style.display = 'block';
         }
       })
-      .catch(function () { /* silencioso */ });
+      .catch(function () { 
+        activeBadge.style.display = 'block';
+
+
+       });
   }
 
   // Lista de serviços
