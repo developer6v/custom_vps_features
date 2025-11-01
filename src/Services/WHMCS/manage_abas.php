@@ -80,7 +80,7 @@ function manage_abas_vps($serviceId, $result) {
     }catch(e){ console.error('fixActiveCloudflare falhou', e); }
   }
 
-  /* Localiza a UL da lista de informações no container informado */
+  /* acha a UL padrão (usa exatamente suas classes) */
   function findInfoList(root){
     if (!root) return null;
     return root.querySelector('ul.list-info.list-info-50.list-info-bordered')
@@ -88,7 +88,7 @@ function manage_abas_vps($serviceId, $result) {
         || root.querySelector('ul.list-info');
   }
 
-  /* Cria um <li> padrão da lista: <li><span class='list-info-title'>t</span><span class='list-info-text'>v</span></li> */
+  /* cria <li> padrão */
   function makeLi(title, value, dataKey){
     var li  = document.createElement('li');
     if (dataKey) li.setAttribute('data-access', dataKey);
@@ -106,50 +106,58 @@ function manage_abas_vps($serviceId, $result) {
     return li;
   }
 
-  /* Move a UL de #configoptions para #domain (se existir) e retorna a UL final que ficará em #domain */
-  function ensureListInDomain(){
+  /* funde os LIs de #configoptions na UL de #domain (sem subtítulo) */
+  function mergeConfigLisIntoDomainUl(){
     var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
     if (!domainPane) return null;
 
-    // 1) já existe UL em #domain?
     var ulDomain = findInfoList(domainPane);
-    if (ulDomain) return ulDomain;
+    var cfgPane  = document.querySelector('.tab-content > .tab-pane#configoptions');
+    var ulCfg    = findInfoList(cfgPane);
 
-    // 2) pega UL de #configoptions (se existir) e move para #domain
-    var cfgPane = document.querySelector('.tab-content > .tab-pane#configoptions');
-    var ulCfg   = findInfoList(cfgPane);
-    if (ulCfg){
-      domainPane.appendChild(ulCfg); // move a UL inteira, com seus LIs
-      return ulCfg;
+    // nada a fundir
+    if (!ulDomain && !ulCfg) return null;
+
+    // se não existe UL em domain e existe em config, move a UL inteira pra domain
+    if (!ulDomain && ulCfg){
+      domainPane.appendChild(ulCfg);
+      ulDomain = ulCfg;
+      ulDomain.setAttribute('data-merged', '1');
+      return ulDomain;
     }
 
-    // 3) fallback: cria uma UL com as classes do seu tema
-    var ul = document.createElement('ul');
-    ul.className = 'list-info list-info-50 list-info-bordered';
-    domainPane.appendChild(ul);
-    return ul;
+    // se existem as duas ULs, move APENAS os <li> de config para a UL de domain
+    if (ulDomain && ulCfg && !ulDomain.hasAttribute('data-merged')){
+      var items = Array.from(ulCfg.children);
+      items.forEach(function(li){
+        if (li && li.tagName === 'LI') ulDomain.appendChild(li);
+      });
+      ulDomain.setAttribute('data-merged', '1');
+      // remove UL vazia de config (se desejar), mas como o painel fica oculto, é opcional:
+      // if (!ulCfg.querySelector('li')) ulCfg.remove();
+    }
+    return ulDomain || ulCfg || null;
   }
 
-  /* Adiciona os LIs de Username/Senha na UL, sem duplicar */
+  /* adiciona Username/Senha como LIs na mesma UL */
   function appendAccessRows(ul, user, pass){
     if (!ul) return false;
-
-    // evita duplicar
-    var hasUser  = ul.querySelector('li[data-access=\"username\"]');
-    var hasPass  = ul.querySelector('li[data-access=\"password\"]');
-
-    if (!hasUser){
+    if (!ul.querySelector('li[data-access=\"username\"]')){
       ul.appendChild(makeLi('Username', user || '', 'username'));
     }
-    if (!hasPass){
+    if (!ul.querySelector('li[data-access=\"password\"]')){
       ul.appendChild(makeLi('Senha', pass || '', 'password'));
     }
     return true;
   }
 
-  // ---- merge principal ----
-  function doMergeAndAccess(user, pass){
-    var ul = ensureListInDomain();
+  function doAll(user, pass){
+    var ul = mergeConfigLisIntoDomainUl();
+    if (!ul){
+      // como fallback, tenta achar UL só em domain
+      var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
+      ul = findInfoList(domainPane);
+    }
     if (!ul) return false;
     appendAccessRows(ul, user, pass);
     return true;
@@ -183,10 +191,8 @@ function manage_abas_vps($serviceId, $result) {
   whenReady(function(){
     fixActiveCloudflare();
 
-    // tenta imediatamente
-    if (!doMergeAndAccess(U, P)){
-      // pequeno retry em caso de hidratação tardia
-      retries(function(){ return doMergeAndAccess(U, P); }, 20, 100); // ~2s
+    if (!doAll(U, P)){
+      retries(function(){ return doAll(U, P); }, 20, 100); // ~2s
     }
   });
 })();
