@@ -35,51 +35,6 @@ function manage_abas_vps($serviceId, $result) {
   .tab-content > .tab-pane#cloudflare-config {
     display: none !important;
   }
-
-  /* Bloco fundido dentro de #domain (configoptions) */
-  .merged-configoptions {
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(0,0,0,.08);
-  }
-  .merged-configoptions > .merged-title {
-    font-weight: 600;
-    margin: 0 0 8px;
-    font-size: 14px;
-    line-height: 1.2;
-  }
-
-  /* Bloco de credenciais em #domain (layout key–value) */
-  .merged-access {
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(0,0,0,.08);
-  }
-  .merged-access .merged-title {
-    font-weight: 600;
-    margin: 0 0 8px;
-    font-size: 14px;
-    line-height: 1.2;
-  }
-  .merged-access .kv-row{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:10px 16px;
-    border-top:1px solid rgba(0,0,0,.06);
-  }
-  .merged-access .kv-row:first-of-type{ margin-top:4px; }
-  .merged-access .kv-label{
-    flex:0 0 45%;
-    color:#6b7280;
-    font-weight:600;
-  }
-  .merged-access .kv-value{
-    flex:1 1 auto;
-    text-align:right;
-    font-weight:600;
-    word-break:break-word;
-  }
 </style>
 
 <script>
@@ -122,69 +77,81 @@ function manage_abas_vps($serviceId, $result) {
           }
         }
       }
-    }catch(e){ console.error('fixActiveCloudflare falhou:', e); }
+    }catch(e){ console.error('fixActiveCloudflare falhou', e); }
   }
 
-  /* Injeta usuário/senha em #domain (texto visível) */
-  function injectCredsSimple(user, pass){
+  /* Localiza a UL da lista de informações no container informado */
+  function findInfoList(root){
+    if (!root) return null;
+    return root.querySelector('ul.list-info.list-info-50.list-info-bordered')
+        || root.querySelector('ul.list-info-bordered')
+        || root.querySelector('ul.list-info');
+  }
+
+  /* Cria um <li> padrão da lista: <li><span class='list-info-title'>t</span><span class='list-info-text'>v</span></li> */
+  function makeLi(title, value, dataKey){
+    var li  = document.createElement('li');
+    if (dataKey) li.setAttribute('data-access', dataKey);
+
+    var s1 = document.createElement('span');
+    s1.className = 'list-info-title';
+    s1.textContent = title;
+
+    var s2 = document.createElement('span');
+    s2.className = 'list-info-text';
+    s2.textContent = value;
+
+    li.appendChild(s1);
+    li.appendChild(s2);
+    return li;
+  }
+
+  /* Move a UL de #configoptions para #domain (se existir) e retorna a UL final que ficará em #domain */
+  function ensureListInDomain(){
     var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
-    if (!domainPane) return false;
+    if (!domainPane) return null;
 
-    if (domainPane.querySelector('.merged-access')) return true;
+    // 1) já existe UL em #domain?
+    var ulDomain = findInfoList(domainPane);
+    if (ulDomain) return ulDomain;
 
-    var wrap = document.createElement('div');
-    wrap.className = 'merged-access';
-    wrap.innerHTML =
-      '<h4 class=\"merged-title\">Acesso</h4>' +
-      '<div class=\"kv-row\">' +
-        '<div class=\"kv-label\">Username</div>' +
-        '<div class=\"kv-value\" id=\"acc-user\"></div>' +
-      '</div>' +
-      '<div class=\"kv-row\">' +
-        '<div class=\"kv-label\">Senha</div>' +
-        '<div class=\"kv-value\" id=\"acc-pass\"></div>' +
-      '</div>';
+    // 2) pega UL de #configoptions (se existir) e move para #domain
+    var cfgPane = document.querySelector('.tab-content > .tab-pane#configoptions');
+    var ulCfg   = findInfoList(cfgPane);
+    if (ulCfg){
+      domainPane.appendChild(ulCfg); // move a UL inteira, com seus LIs
+      return ulCfg;
+    }
 
-    domainPane.appendChild(wrap);
-    wrap.querySelector('#acc-user').textContent = user || '';
-    wrap.querySelector('#acc-pass').textContent = pass || '';
+    // 3) fallback: cria uma UL com as classes do seu tema
+    var ul = document.createElement('ul');
+    ul.className = 'list-info list-info-50 list-info-bordered';
+    domainPane.appendChild(ul);
+    return ul;
+  }
+
+  /* Adiciona os LIs de Username/Senha na UL, sem duplicar */
+  function appendAccessRows(ul, user, pass){
+    if (!ul) return false;
+
+    // evita duplicar
+    var hasUser  = ul.querySelector('li[data-access=\"username\"]');
+    var hasPass  = ul.querySelector('li[data-access=\"password\"]');
+
+    if (!hasUser){
+      ul.appendChild(makeLi('Username', user || '', 'username'));
+    }
+    if (!hasPass){
+      ul.appendChild(makeLi('Senha', pass || '', 'password'));
+    }
     return true;
   }
 
-  function tryInjectCreds(user, pass, max, delay){
-    var count = 0;
-    var t = setInterval(function(){
-      count++;
-      if (injectCredsSimple(user, pass) || count >= (max||20)) clearInterval(t);
-    }, delay||100);
-  }
-
-  // ---- merge: move conteúdo de #configoptions para #domain ----
-  function doMerge(){
-    var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
-    var cfgPane    = document.querySelector('.tab-content > .tab-pane#configoptions');
-    if (!domainPane || !cfgPane) return false;
-
-    if (domainPane.querySelector('.merged-configoptions')) return true;
-
-    var hasRealContent = Array.prototype.some.call(cfgPane.childNodes, function(n){
-      return (n.nodeType === 1) || (n.nodeType === 3 && String(n.textContent||'').trim() !== '');
-    });
-    if (!hasRealContent) return true;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'merged-configoptions';
-
-    // (opcional) título — se quiser ocultar, basta comentar as 2 linhas abaixo
-    var title = document.createElement('h4');
-    title.className = 'merged-title';
-    title.textContent = 'Opções configuráveis';
-    wrap.appendChild(title);
-
-    while (cfgPane.firstChild){
-      wrap.appendChild(cfgPane.firstChild);
-    }
-    domainPane.appendChild(wrap);
+  // ---- merge principal ----
+  function doMergeAndAccess(user, pass){
+    var ul = ensureListInDomain();
+    if (!ul) return false;
+    appendAccessRows(ul, user, pass);
     return true;
   }
 
@@ -196,11 +163,11 @@ function manage_abas_vps($serviceId, $result) {
     }
   }
 
-  function tryMergeWithRetries(max, delay){
+  function retries(fn, max, delay){
     var count = 0;
     var t = setInterval(function(){
       count++;
-      if (doMerge()){
+      if (fn()){
         clearInterval(t);
       } else if (count >= max){
         clearInterval(t);
@@ -208,35 +175,18 @@ function manage_abas_vps($serviceId, $result) {
     }, delay);
   }
 
-  function observeForPanes(){
-    try{
-      var target = document.querySelector('.tab-content') || document.body;
-      if (!target || typeof MutationObserver === 'undefined') return;
-      var done = false;
-      var obs = new MutationObserver(function(){
-        if (done) return;
-        if (doMerge()){
-          done = true;
-          obs.disconnect();
-        }
-      });
-      obs.observe(target, {childList:true, subtree:true});
-    }catch(e){ console.warn('observer indisponível', e); }
-  }
+  var U = " . json_encode($username, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
+  var P = " . json_encode($senha,    JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
 
   try { console.log('manage_abas_vps: payload', {$resultJson}); } catch(e){}
 
   whenReady(function(){
     fixActiveCloudflare();
 
-    /* injeta credenciais visíveis em #domain */
-    var U = " . json_encode($username, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
-    var P = " . json_encode($senha,    JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
-    tryInjectCreds(U, P, 20, 100);
-
-    if (!doMerge()){
-      observeForPanes();
-      tryMergeWithRetries(15, 200); // ~3s no total
+    // tenta imediatamente
+    if (!doMergeAndAccess(U, P)){
+      // pequeno retry em caso de hidratação tardia
+      retries(function(){ return doMergeAndAccess(U, P); }, 20, 100); // ~2s
     }
   });
 })();
