@@ -28,7 +28,6 @@ informacoes adicionais
                   .panel-nav .nav-tabs li:has(> a[href='#email']),
                     .panel-nav .nav-tabs li:has(> a[href='#configoptions']),
                     .panel-nav .nav-tabs li:has(> a[href='#additionalinfo'])
-                    .panel-nav .nav-tabs li:has(> a[href='#cloudflare-config'])
                     { display: none !important; }
                   
             
