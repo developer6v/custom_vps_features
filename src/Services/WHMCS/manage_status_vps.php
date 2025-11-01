@@ -14,7 +14,7 @@ function manage_status_vps($serviceId, $result) {
 
     
     $productname = $result["products"]["product"][0]["name"] ?? '';
-    if (stripos($productname, 'VPS') !== false) {
+    if (stripos($productname, 'VPS') !== false || stripos($productname, 'n8n') !== false) {
         $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
         if ($ip == "" || !$ip) {
             return "

@@ -20,9 +20,8 @@ informacoes adicionais
 */
     
     $productname = $result["products"]["product"][0]["name"] ?? '';
-    if (stripos($productname, 'VPS') !== false) {
-        $ip = $result["products"]["product"][0]["dedicatedip"] ?? '';
-        if ($ip == "" || !$ip) {
+    if (stripos($productname, 'VPS') !== false || stripos($productname, 'n8n') !== false) {
+
             return "
                 <style>
                   
@@ -85,7 +84,6 @@ informacoes adicionais
                   })();
                 </script>
             ";
-        }
     }
 
     return "<script>console.log('não encontrou abas', {$resultJson});</script>";
