@@ -43,6 +43,8 @@ add_hook('EmailPreSend', 1, function($vars) {
     if ($vars['messagename'] == 'New Dedicated Server Information' || $vars['messagename'] == 'Dedicated/VPS Server Welcome Email') {
         $merge_fields['abortsend'] = true;
         sendEmailRd($merge_fields);
+            logActivity("foi acionado");
+
     }
     return $merge_fields;
 });
