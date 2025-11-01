@@ -13,8 +13,8 @@ function manage_abas_vps($serviceId, $result) {
     );
 
     $productname = $result["products"]["product"][0]["name"] ?? '';
-    $username = $result["products"]["product"][0]["username"] ?? '';
-    $senha = $result["products"]["product"][0]["password"] ?? '';
+    $username    = $result["products"]["product"][0]["username"] ?? '';
+    $senha       = $result["products"]["product"][0]["password"] ?? '';
 
     if (stripos($productname, 'VPS') !== false || stripos($productname, 'n8n') !== false) {
 
@@ -36,7 +36,7 @@ function manage_abas_vps($serviceId, $result) {
     display: none !important;
   }
 
-  /* Bloco fundido dentro de #domain */
+  /* Bloco fundido dentro de #domain (configoptions) */
   .merged-configoptions {
     margin-top: 16px;
     padding-top: 12px;
@@ -49,7 +49,7 @@ function manage_abas_vps($serviceId, $result) {
     line-height: 1.2;
   }
 
-  /* --- [ADD] Bloco de credenciais visíveis em #domain --- */
+  /* Bloco de credenciais em #domain (layout key–value) */
   .merged-access {
     margin-top: 16px;
     padding-top: 12px;
@@ -61,8 +61,25 @@ function manage_abas_vps($serviceId, $result) {
     font-size: 14px;
     line-height: 1.2;
   }
-  .merged-access .row-line { margin: 6px 0; }
-  .merged-access .label    { display:inline-block; min-width: 90px; font-weight: 500; }
+  .merged-access .kv-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 16px;
+    border-top:1px solid rgba(0,0,0,.06);
+  }
+  .merged-access .kv-row:first-of-type{ margin-top:4px; }
+  .merged-access .kv-label{
+    flex:0 0 45%;
+    color:#6b7280;
+    font-weight:600;
+  }
+  .merged-access .kv-value{
+    flex:1 1 auto;
+    text-align:right;
+    font-weight:600;
+    word-break:break-word;
+  }
 </style>
 
 <script>
@@ -108,29 +125,32 @@ function manage_abas_vps($serviceId, $result) {
     }catch(e){ console.error('fixActiveCloudflare falhou:', e); }
   }
 
-  /* --- [ADD] Injeta usuário/senha em #domain, texto puro --- */
+  /* Injeta usuário/senha em #domain (texto visível) */
   function injectCredsSimple(user, pass){
     var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
     if (!domainPane) return false;
 
-    // evita duplicar
     if (domainPane.querySelector('.merged-access')) return true;
 
     var wrap = document.createElement('div');
     wrap.className = 'merged-access';
     wrap.innerHTML =
       '<h4 class=\"merged-title\">Acesso</h4>' +
-      '<div class=\"row-line\"><span class=\"label\">Usuário:</span> <span id=\"acc-user\"></span></div>' +
-      '<div class=\"row-line\"><span class=\"label\">Senha:</span> <span id=\"acc-pass\"></span></div>';
+      '<div class=\"kv-row\">' +
+        '<div class=\"kv-label\">Username</div>' +
+        '<div class=\"kv-value\" id=\"acc-user\"></div>' +
+      '</div>' +
+      '<div class=\"kv-row\">' +
+        '<div class=\"kv-label\">Senha</div>' +
+        '<div class=\"kv-value\" id=\"acc-pass\"></div>' +
+      '</div>';
 
     domainPane.appendChild(wrap);
-    // valores diretos, visíveis
     wrap.querySelector('#acc-user').textContent = user || '';
     wrap.querySelector('#acc-pass').textContent = pass || '';
     return true;
   }
 
-  /* --- [ADD] Pequeno helper para tentar injetar até o #domain existir --- */
   function tryInjectCreds(user, pass, max, delay){
     var count = 0;
     var t = setInterval(function(){
@@ -145,19 +165,22 @@ function manage_abas_vps($serviceId, $result) {
     var cfgPane    = document.querySelector('.tab-content > .tab-pane#configoptions');
     if (!domainPane || !cfgPane) return false;
 
-    // evita duplicar
     if (domainPane.querySelector('.merged-configoptions')) return true;
 
-    // verifica se #configoptions tem algo útil
     var hasRealContent = Array.prototype.some.call(cfgPane.childNodes, function(n){
       return (n.nodeType === 1) || (n.nodeType === 3 && String(n.textContent||'').trim() !== '');
     });
-    if (!hasRealContent) return true; // evita loop
+    if (!hasRealContent) return true;
 
     var wrap = document.createElement('div');
     wrap.className = 'merged-configoptions';
 
-    // move filhos (mantém estados de inputs)
+    // (opcional) título — se quiser ocultar, basta comentar as 2 linhas abaixo
+    var title = document.createElement('h4');
+    title.className = 'merged-title';
+    title.textContent = 'Opções configuráveis';
+    wrap.appendChild(title);
+
     while (cfgPane.firstChild){
       wrap.appendChild(cfgPane.firstChild);
     }
@@ -206,7 +229,7 @@ function manage_abas_vps($serviceId, $result) {
   whenReady(function(){
     fixActiveCloudflare();
 
-    /* --- [ADD] injeta credenciais visíveis em #domain --- */
+    /* injeta credenciais visíveis em #domain */
     var U = " . json_encode($username, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
     var P = " . json_encode($senha,    JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
     tryInjectCreds(U, P, 20, 100);
