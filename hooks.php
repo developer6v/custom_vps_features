@@ -16,9 +16,11 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
 
         $output = manage_status_vps($serviceId, $result);
         $output .= manage_abas_vps($serviceId, $result);
+        $output .= manage_status_clientarea($serviceId, $result);
         return $output;
     }
 
     return "";
 
 });
+
