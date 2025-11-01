@@ -2,7 +2,7 @@
 
 use WHMCS\Database\Capsule;
 
-function refreshToken() {
+function refreshtokenvps() {
     $config = Capsule::table("sr_rds_station_config")->where("id", 1)->first();
     if (!$config) return false;
 

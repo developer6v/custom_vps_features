@@ -154,8 +154,8 @@ function sendEmailRd(array $merge_fields)
 
     // envia
     [$code,$res,$err] = $do($token,$body);
-    if ($code === 401 && function_exists('refreshToken')) {
-        refreshToken();
+    if ($code === 401 && function_exists('refreshtokenvps')) {
+        refreshtokenvps();
         $cfg   = Capsule::table('sr_rds_station_config')->where('id', 1)->first();
         $token = (string)($cfg->access_token ?? '');
         [$code,$res,$err] = $do($token,$body);
