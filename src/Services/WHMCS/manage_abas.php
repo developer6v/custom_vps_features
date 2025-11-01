@@ -34,12 +34,12 @@ function manage_abas_vps($serviceId, $result) {
   }
 
   /* Bloco fundido dentro de #domain */
-  .merged-additionalinfo {
+  .merged-configoptions {
     margin-top: 16px;
     padding-top: 12px;
     border-top: 1px solid rgba(0,0,0,.08);
   }
-  .merged-additionalinfo > .merged-title {
+  .merged-configoptions > .merged-title {
     font-weight: 600;
     margin: 0 0 8px;
     font-size: 14px;
@@ -49,7 +49,6 @@ function manage_abas_vps($serviceId, $result) {
 
 <script>
 (function(){
-  // ---- util: garante troca pra #domain se cloudflare vier ativa ----
   function fixActiveCloudflare(){
     try{
       var cloudA = document.querySelector('.panel-nav .nav-tabs a[href=\"#cloudflare-config\"]');
@@ -91,38 +90,37 @@ function manage_abas_vps($serviceId, $result) {
     }catch(e){ console.error('fixActiveCloudflare falhou', e); }
   }
 
-  // ---- merge: move conteúdo de #additionalinfo para #domain ----
+  // ---- merge: move conteúdo de #configoptions para #domain ----
   function doMerge(){
     var domainPane = document.querySelector('.tab-content > .tab-pane#domain');
-    var addPane    = document.querySelector('.tab-content > .tab-pane#additionalinfo');
-    if (!domainPane || !addPane) return false;
+    var cfgPane    = document.querySelector('.tab-content > .tab-pane#configoptions');
+    if (!domainPane || !cfgPane) return false;
 
     // evita duplicar
-    if (domainPane.querySelector('.merged-additionalinfo')) return true;
+    if (domainPane.querySelector('.merged-configoptions')) return true;
 
-    // se #additionalinfo não tem conteúdo útil, não faz nada
-    var hasRealContent = Array.prototype.some.call(addPane.childNodes, function(n){
+    // verifica se #configoptions tem algo útil
+    var hasRealContent = Array.prototype.some.call(cfgPane.childNodes, function(n){
       return (n.nodeType === 1) || (n.nodeType === 3 && String(n.textContent||'').trim() !== '');
     });
-    if (!hasRealContent) return true; // considera concluído para evitar loops
+    if (!hasRealContent) return true; // evita loop
 
     var wrap = document.createElement('div');
-    wrap.className = 'merged-additionalinfo';
+    wrap.className = 'merged-configoptions';
 
     var title = document.createElement('h4');
     title.className = 'merged-title';
-    title.textContent = 'Informações adicionais';
+    title.textContent = 'Opções configuráveis';
     wrap.appendChild(title);
 
     // move filhos (mantém estados de inputs)
-    while (addPane.firstChild){
-      wrap.appendChild(addPane.firstChild);
+    while (cfgPane.firstChild){
+      wrap.appendChild(cfgPane.firstChild);
     }
     domainPane.appendChild(wrap);
     return true;
   }
 
-  // ---- estratégia de espera: DOMContentLoaded + Observer + retries ----
   function whenReady(cb){
     if (document.readyState === 'complete' || document.readyState === 'interactive'){
       cb();
@@ -159,23 +157,15 @@ function manage_abas_vps($serviceId, $result) {
     }catch(e){ console.warn('observer indisponível', e); }
   }
 
-  try {
-    console.log('manage_abas_vps: payload', {$resultJson});
-  } catch(e){}
+  try { console.log('manage_abas_vps: payload', {$resultJson}); } catch(e){}
 
   whenReady(function(){
-    // garante que a UI não fique presa na aba escondida
     fixActiveCloudflare();
-
-    // tenta imediatamente
     if (!doMerge()){
-      // observa carregamentos tardios
       observeForPanes();
-      // e ainda tenta em retries (ex.: templates que hidratam em etapas)
-      tryMergeWithRetries(15, 200); // 15 tentativas a cada 200ms (~3s)
+      tryMergeWithRetries(15, 200); // ~3s no total
     }
   });
-
 })();
 </script>
         ";
