@@ -108,10 +108,6 @@ function manage_abas_vps($serviceId, $result) {
     var wrap = document.createElement('div');
     wrap.className = 'merged-configoptions';
 
-    var title = document.createElement('h4');
-    title.className = 'merged-title';
-    title.textContent = 'Opções configuráveis';
-    wrap.appendChild(title);
 
     // move filhos (mantém estados de inputs)
     while (cfgPane.firstChild){
