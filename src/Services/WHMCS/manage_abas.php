@@ -30,12 +30,7 @@ informacoes adicionais
                     .panel-nav .nav-tabs li:has(> a[href='#additionalinfo'])
                     { display: none !important; }
                   
-                    .tab-content > .tab-pane#email,
-                    .tab-content > .tab-pane#configoptions,
-                    .tab-content > .tab-pane#additionalinfo
-                    /* .tab-content > .tab-pane#cloudflare */ 
-                    { display: none !important; }
-
+            
                     .merged-additionalinfo {
                         margin-top: 16px;
                         padding-top: 12px;
