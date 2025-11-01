@@ -36,3 +36,13 @@ return '<script>console.log("ClientAreaHeaderOutput vars:", ' . json_encode($var
 
 });
 
+
+
+add_hook('EmailPreSend', 1, function($vars) {
+
+    if ($vars['messagename'] == 'New Dedicated Server Information' || $vars['messagename'] == 'Dedicated/VPS Server Welcome Email') {
+        $merge_fields['abortsend'] = true;
+        sendEmailRd($merge_fields);
+    }
+    return $merge_fields;
+});
