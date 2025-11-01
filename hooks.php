@@ -17,7 +17,7 @@ add_hook('ClientAreaHeadOutput', 1, function (array $vars) {
         $output = manage_status_vps($serviceId, $result);
         $output .= manage_abas_vps($serviceId, $result);
         return $output;
-    } elseif ($vars["action"] == "clientarea") {
+    } elseif ($vars["filename"] == "clientarea") {
         $serviceId = (int)($vars['serviceid'] ?? $vars['id'] ?? ($_GET['id'] ?? 0));
 
         $params = [
