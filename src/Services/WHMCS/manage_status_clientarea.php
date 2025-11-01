@@ -10,6 +10,9 @@ function manage_status_clientarea() {
 
     $out = <<<HTML
 <style>
+  .label-success {
+    display: none;
+  }
   .label-setup {
     background: #ffa64d; /* laranja suave */
     color: #2b2b2b;
@@ -69,6 +72,8 @@ function manage_status_clientarea() {
           activeBadge.setAttribute('title', 'Fazendo Setup');
           activeBadge.classList.remove('label-success');
           activeBadge.classList.add('label-setup');
+        } else {
+          activeBadge.style('display', 'block');
         }
       })
       .catch(function () { /* silencioso */ });
