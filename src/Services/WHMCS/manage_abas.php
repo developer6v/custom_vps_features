@@ -26,10 +26,7 @@ informacoes adicionais
             return "
                 <style>
                   
-                  .panel-nav .nav-tabs li:has(> a[href='#email']),
-                    .panel-nav .nav-tabs li:has(> a[href='#configoptions']),
-                    .panel-nav .nav-tabs li:has(> a[href='#additionalinfo'])
-                    { display: none !important; }
+                  
                   
                   
                 </style>
