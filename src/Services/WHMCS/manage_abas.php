@@ -15,8 +15,9 @@ function manage_abas_vps($serviceId, $result) {
     $productname = $result["products"]["product"][0]["name"] ?? '';
     $username    = $result["products"]["product"][0]["username"] ?? '';
     $senha       = $result["products"]["product"][0]["password"] ?? '';
+    $status       = $result["products"]["product"][0]["status"] ?? '';
 
-    if (stripos($productname, 'VPS') !== false || stripos($productname, 'n8n') !== false) {
+    if ((stripos($productname, 'VPS') !== false || stripos($productname, 'n8n') !== false )) {
 
         return "
 <style>

@@ -2,10 +2,6 @@
 /**
  * Endpoint: /index.php?m=setupStatus&action=check&serviceid=XXXX
  * Retorna JSON { setup: true|false }
- *
- * Regra de exemplo:
- * - Se o produto for VPS ou n8n E ainda não tiver IP dedicado -> setup = true
- *   (ajuste a regra conforme sua necessidade)
  */
 
 use WHMCS\Database\Capsule;
@@ -46,17 +42,16 @@ try {
     // Busca dados do serviço via localAPI
     $params = [
         'serviceid' => $serviceId,
-        'stats'     => true, // opcional, traz mais campos
+        'stats'     => true,
     ];
     $result = localAPI('GetClientsProducts', $params);
 
     if (!is_array($result) || ($result['result'] ?? '') !== 'success') {
-        // Falha na API
         http_response_code(500);
         echo json_encode([
-            'setup' => false,
-            'error' => 'localAPI error',
-            'message' => $result['message'] ?? 'Unknown error'
+            'setup'   => false,
+            'error'   => 'localAPI error',
+            'message' => $result['message'] ?? 'Unknown error',
         ]); exit;
     }
 
@@ -66,18 +61,20 @@ try {
     }
 
     $productName = (string)($product['name'] ?? '');
+    $statusRaw   = (string)($product['status'] ?? '');
+    $status      = strtolower(trim($statusRaw));
     $dedicatedIp = (string)($product['dedicatedip'] ?? '');
 
-    // --- SUA REGRA DE "EM SETUP" ---
-    // Exemplo 1: produto é VPS ou n8n e ainda não tem IP => em setup
+    // ➜ Só filtra se o status for Active
+    if ($status !== 'active') {
+        echo json_encode(['setup' => false, 'reason' => 'status_not_active']); exit;
+    }
+
+    // --- REGRA DE "EM SETUP" (inalterada) ---
     $isVpsOrN8n = (stripos($productName, 'VPS') !== false) || (stripos($productName, 'n8n') !== false);
     $noIpYet    = ($dedicatedIp === '' || $dedicatedIp === '0.0.0.0');
 
     $inSetup = ($isVpsOrN8n && $noIpYet);
-
-    // Exemplo 2 (opcional): considerar também status Pending como setup
-    // $status  = strtolower((string)($product['status'] ?? ''));
-    // $inSetup = $inSetup || ($status === 'pending');
 
     echo json_encode(['setup' => (bool)$inSetup]); exit;
 
