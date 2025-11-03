@@ -184,8 +184,9 @@ function manage_abas_vps($serviceId, $result) {
     }, delay);
   }
 
-  var U = " . json_encode($username, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
-  var P = " . json_encode($senha,    JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
+  var U = " . json_encode($username, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ";
+  var P = " . json_encode($senha,    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ";
+
 
 
 
