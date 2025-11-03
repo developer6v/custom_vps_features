@@ -8,7 +8,7 @@ function manage_status_clientarea() {
     $baseUrl = rtrim(Setting::getValue('SystemURL'), '/');
     $endpointBase = $baseUrl . '/modules/addons/custom_vps_features/src/Controllers/validate_service.php?serviceid=';
 
-    $out = <<<HTML
+    $out = "
 <style>
   .label-success {
     display: none;
@@ -20,9 +20,9 @@ function manage_status_clientarea() {
 </style>
 
 <script>
-    console.log("chegou aqui");
+    console.log('chegou aqui');
 (function () {
-  "use strict";
+  'use strict';
 
   function getServiceIdFromHref(href) {
     try {
@@ -144,7 +144,7 @@ function manage_status_clientarea() {
   }
 })();
 </script>
-HTML;
+";
 
     return $out;
 }
