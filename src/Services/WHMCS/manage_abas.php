@@ -1,14 +1,14 @@
 <?php
 function manage_abas_vps($serviceId, $result) {
-    $resultJson = json_encode(
-        $result,
-        JSON_UNESCAPED_UNICODE
-        | JSON_UNESCAPED_SLASHES
-        | JSON_HEX_TAG
-        | JSON_HEX_APOS
-        | JSON_HEX_QUOT
-        | JSON_HEX_AMP
-    );
+  $resultJson = json_encode(
+      $result,
+      JSON_UNESCAPED_UNICODE
+      | JSON_HEX_TAG
+      | JSON_HEX_APOS
+      | JSON_HEX_QUOT
+      | JSON_HEX_AMP
+  );
+
 
     $productname = $result["products"]["product"][0]["name"] ?? '';
     $username    = $result["products"]["product"][0]["username"] ?? '';
