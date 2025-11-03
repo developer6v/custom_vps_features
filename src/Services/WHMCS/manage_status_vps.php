@@ -27,7 +27,6 @@ function manage_status_vps($serviceId, $result) {
                   }
                 </style>
                 <script>
-                  console.log('encontrou', {$resultJson});
                   document.addEventListener('DOMContentLoaded', function () {
                     var el = document.querySelector('.status');
                     if (el) {
@@ -40,7 +39,7 @@ function manage_status_vps($serviceId, $result) {
         }
     }
 
-    return "<script>console.log('não encontrou', {$resultJson});</script>";
+    return "";
 }
 
 ?>

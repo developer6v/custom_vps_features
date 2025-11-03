@@ -187,7 +187,7 @@ function manage_abas_vps($serviceId, $result) {
   var U = " . json_encode($username, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
   var P = " . json_encode($senha,    JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) . ";
 
-  try { console.log('manage_abas_vps: payload', {$resultJson}); } catch(e){}
+
 
   whenReady(function(){
     fixActiveCloudflare();
